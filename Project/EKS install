@@ -1,1 +1,30 @@
+1. install kubectl using below commands
+     curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.19.6/2021-01-05/bin/linux/amd64/kubectl
+     chmod +x ./kubectl
+     sudo mv ./kubectl /usr/local/bin
+     kubectl version --short --client
 
+
+2. Install AWS CLI latest version
+       sudo apt install unzip
+       curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+       unzip awscliv2.zip
+       sudo ./aws/install
+       aws --version
+3. Install eksctl
+        curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+        sudo mv /tmp/eksctl /usr/local/bin
+        eksctl version
+4. eksctl create cluster --name=shivacluster \
+                      --region=ap-south-1 \
+                      --zones=ap-south-1a,ap-south-1b \
+                      --without-nodegroup 
+
+5.eksctl create nodegroup --cluster=shivacluster --region=ap-south-1 --name=demo-ng-public1 --node-type=t3.medium --nodes=2 --nodes-min=2 --nodes-max=4 --node-volume-size=20 --ssh-access --ssh-public-key=ansible --managed --asg-access --external-dns-access --full-ecr-access --appmesh-access --alb-ingress-access
+6.eksctl utils associate-iam-oidc-provider --region ap-south-1 --cluster shivacluster --approve
+7.eksctl get clusters
+8.Create New Role using IAM service ( Select Usecase - ec2 )Add below permissions for the roleAdministrator - acces
+9.Delete the cluster 
+     eksctl get nodegroup --cluster=namecluster   :  eksctl get nodegroup --cluster=shivacluster
+     eksctl delete nodegroup --cluster=cluster --name=nodegroup name   :  eksctl delete nodegroup --cluster=shivacluster --name=demo-ng-public1
+     eksctl delete cluster name cluster :: eksctl delete cluster shivacluster
