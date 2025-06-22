@@ -1,0 +1,38 @@
+
+[C] Setup Monitoring for Kubernetes using Helm, Prometheus and Grafana Dashboard
+1 ) Install Helm Chart
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
+helm version
+
+ Monitor Kubernetes with Prometheus
+------------------------------------------------------------
+Used to monitor Kubernetes cluster.
+Additionally, you'll install the node exporter using Helm to collect metrics from your cluster nodes.
+
+Install Node Exporter using Helm
+To begin monitoring your Kubernetes cluster, you'll install the Prometheus Node Exporter. This component allows you to collect system-level metrics from your cluster nodes. Here are the steps to install the Node Exporter using Helm:
+
+Add the Prometheus Community Helm repository:
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+
+Create a Kubernetes namespace for the Node Exporter:
+kubectl create namespace prometheus-node-exporter
+
+Install the Node Exporter using Helm:
+helm install prometheus-node-exporter prometheus-community/prometheus-node-exporter --namespace prometheus-node-exporter
+
+Update your Prometheus configuration (prometheus.yml) to add a new job for scraping metrics from nodeip:9001/metrics. You can do this by adding the following configuration to your prometheus.yml file:
+Go to the monitoring server tab in Moba and execute the below commands;
+sudo vi /etc/prometheus/prometheus.yml ----> Paste the below commands at the bottom of screen ----> 
+  - job_name: 'k8s'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['nodeIP:9100']
+
+In the above, to get the "nodeIP", goto EKS in AWS ----> Click on EKS Cluster ----> "Compute" tab ----> Nodes ----> Click on any one node ----> Click on the "instance id" ----> Copy the public ip ----> Paste in the above script
+
+The static_configs section specifies the targets to scrape metrics from, and in this case, it's set to nodeip:9001.
+
+----> esc ----> :wq ----> promtool check config /etc/prometheus/prometheus.yml ----> You should see "Success" ----> Check the validity of the configuration file ----> promtool check config /etc/prometheus/prometheus.yml ----> curl -X POST http://localhost:9090/-/reload
